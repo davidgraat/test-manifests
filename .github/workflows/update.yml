@@ -16,9 +16,17 @@ jobs:
     steps:
       - name: Checkout manifests repo
         uses: actions/checkout@v4
+        with:
+          repository: davidgraat/test-manifests
+          ref: main
 
       - name: Update manifest
         run: |
+          if [ ! -f "deploy.yaml" ]; then
+            echo "Manifest file not found: deploy.yaml"
+            ls -la
+            exit 1
+          fi
           sed -i "s|image: myapp:.*|image: myapp:${{ inputs.image-tag }}|" deploy.yaml
 
       - name: Commit and push
