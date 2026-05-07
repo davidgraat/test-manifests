@@ -1,0 +1,30 @@
+name: Update Manifests
+
+on:
+  workflow_call:
+    inputs:
+      image-tag:
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout manifests repo
+        uses: actions/checkout@v4
+
+      - name: Update manifest
+        run: |
+          sed -i "s|image: myapp:.*|image: myapp:${{ inputs.image-tag }}|" deploy.yaml
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add deploy.yaml
+          git commit -m "Update image tag to ${{ inputs.image-tag }}"
+          git push
